@@ -1,0 +1,256 @@
+name: Unity CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'claude/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  UNITY_VERSION: 2022.3.10f1
+
+jobs:
+  # Job 1: Activation de la licence Unity (si nécessaire)
+  checkLicense:
+    name: Check Unity License
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for Unity License
+        run: |
+          if [ -z "${{ secrets.UNITY_LICENSE }}" ]; then
+            echo "⚠️ UNITY_LICENSE secret not found!"
+            echo "Please follow the documentation to activate your license."
+            exit 1
+          else
+            echo "✅ Unity license found!"
+          fi
+
+  # Job 2: Tests unitaires
+  testRunner:
+    name: Run Unity Tests
+    runs-on: ubuntu-latest
+    needs: checkLicense
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+
+      - name: Run Unity Tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Unity Test Results
+          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: Test-Results
+          path: artifacts
+
+      - name: Upload Coverage Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: Coverage-Results
+          path: CodeCoverage
+
+  # Job 3: Build pour Windows
+  buildWindows:
+    name: Build for Windows
+    runs-on: ubuntu-latest
+    needs: testRunner
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-Windows-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Windows-
+            Library-
+
+      - name: Build for Windows
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: StandaloneWindows64
+          buildName: Emerald-Windows
+
+      - name: Upload Windows Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: Build-Windows
+          path: build/StandaloneWindows64
+
+  # Job 4: Build pour Linux
+  buildLinux:
+    name: Build for Linux
+    runs-on: ubuntu-latest
+    needs: testRunner
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-Linux-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Linux-
+            Library-
+
+      - name: Build for Linux
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: StandaloneLinux64
+          buildName: Emerald-Linux
+
+      - name: Upload Linux Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: Build-Linux
+          path: build/StandaloneLinux64
+
+  # Job 5: Build pour macOS
+  buildMacOS:
+    name: Build for macOS
+    runs-on: ubuntu-latest
+    needs: testRunner
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-macOS-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-macOS-
+            Library-
+
+      - name: Build for macOS
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: StandaloneOSX
+          buildName: Emerald-macOS
+
+      - name: Upload macOS Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: Build-macOS
+          path: build/StandaloneOSX
+
+  # Job 6: Build pour WebGL
+  buildWebGL:
+    name: Build for WebGL
+    runs-on: ubuntu-latest
+    needs: testRunner
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-WebGL-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-WebGL-
+            Library-
+
+      - name: Build for WebGL
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: WebGL
+          buildName: Emerald-WebGL
+
+      - name: Upload WebGL Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: Build-WebGL
+          path: build/WebGL
+
+  # Job 7: Deploy WebGL sur GitHub Pages (optionnel)
+  deployWebGL:
+    name: Deploy WebGL to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: buildWebGL
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download WebGL Build
+        uses: actions/download-artifact@v3
+        with:
+          name: Build-WebGL
+          path: build/WebGL
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/WebGL
+          force_orphan: true
