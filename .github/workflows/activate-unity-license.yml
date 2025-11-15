@@ -1,0 +1,49 @@
+name: Activate Unity License
+
+# Ce workflow vous aide à obtenir votre fichier de licence Unity
+# Exécutez-le manuellement une seule fois pour générer votre licence
+
+on:
+  workflow_dispatch:
+
+jobs:
+  activation:
+    name: Request Unity Activation File
+    runs-on: ubuntu-latest
+    steps:
+      # Étape 1: Générer le fichier de demande de licence
+      - name: Request manual activation file
+        id: getManualLicenseFile
+        uses: game-ci/unity-request-activation-file@v2
+        with:
+          unityVersion: 2022.3.10f1
+
+      # Étape 2: Uploader le fichier pour que vous puissiez le télécharger
+      - name: Expose as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Unity_Activation_File.alf
+          path: ${{ steps.getManualLicenseFile.outputs.filePath }}
+
+      # Instructions
+      - name: Instructions
+        run: |
+          echo "=========================================="
+          echo "📋 INSTRUCTIONS POUR ACTIVER UNITY"
+          echo "=========================================="
+          echo ""
+          echo "1. Téléchargez le fichier 'Unity_Activation_File.alf' depuis les artifacts de ce workflow"
+          echo "2. Allez sur: https://license.unity3d.com/manual"
+          echo "3. Uploadez le fichier .alf"
+          echo "4. Téléchargez le fichier .ulf que Unity génère"
+          echo "5. Convertissez le contenu du fichier .ulf en base64:"
+          echo "   - Linux/Mac: cat Unity_v2022.x.ulf | base64"
+          echo "   - Windows: certutil -encode Unity_v2022.x.ulf encoded.txt"
+          echo "6. Ajoutez le contenu base64 comme secret 'UNITY_LICENSE' dans votre repo GitHub"
+          echo "   Settings > Secrets and variables > Actions > New repository secret"
+          echo ""
+          echo "Vous devrez aussi ajouter (pour Unity Personal/Plus):"
+          echo "   - UNITY_EMAIL: votre email Unity"
+          echo "   - UNITY_PASSWORD: votre mot de passe Unity"
+          echo ""
+          echo "=========================================="
