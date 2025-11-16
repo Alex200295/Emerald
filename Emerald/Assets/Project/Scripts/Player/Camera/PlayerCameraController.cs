@@ -136,17 +136,22 @@ public class PlayerCameraController : MonoBehaviour
 
     /// <summary>
     /// Crée et configure automatiquement une Cinemachine Camera.
+    /// La caméra virtuelle est créée comme enfant du Player pour une meilleure organisation.
     /// </summary>
     private void CreateAndConfigureCinemachineCamera()
     {
-        // Créer le GameObject de la caméra virtuelle
+        // Créer le GameObject de la caméra virtuelle comme enfant du Player
         GameObject vcamObject = new GameObject("CM vcam_Player");
+        vcamObject.transform.SetParent(transform);
+        vcamObject.transform.localPosition = Vector3.zero;
+        vcamObject.transform.localRotation = Quaternion.identity;
+
         cinemachineCamera = vcamObject.AddComponent<CinemachineCamera>();
 
         // Configuration par défaut
         cinemachineCamera.Priority.Value = 10;
 
-        Debug.Log("[PlayerCameraController] Cinemachine Camera créée automatiquement");
+        Debug.Log("[PlayerCameraController] Cinemachine Camera créée automatiquement comme enfant du Player");
 
         // Configurer la caméra
         ConfigureCinemachineCamera();
