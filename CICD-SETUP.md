@@ -26,7 +26,7 @@ Ce projet utilise **GitHub Actions** avec **GameCI** pour automatiser:
 
 - Compte Unity (Personal, Plus ou Pro)
 - Compte GitHub
-- Projet Unity (version 2022.3.10f1 ou supérieure)
+- Projet Unity (version 6000.2.11f1 / Unity 6 ou supérieure)
 - Git installé localement
 
 ## ⚙️ Configuration initiale
