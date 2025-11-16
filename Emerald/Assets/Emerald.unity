@@ -1000,10 +1000,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCameraController
   cameraFollowTarget: {fileID: 0}
   cinemachineCamera: {fileID: 0}
-  mouseSensitivityX: 2
-  mouseSensitivityY: 2
+  mouseSensitivityX: 1
+  mouseSensitivityY: 1
   minVerticalAngle: -40
   maxVerticalAngle: 80
+  cameraFollowTargetHeight: 1.35
   cameraDistance: 8
   shoulderOffset: {x: 0, y: 0, z: 0}
   verticalArmLength: 0
@@ -1229,7 +1230,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8127037470656159457, guid: 2da5764dfacadf54ba60076118fd3905, type: 3}
       propertyPath: rotationSpeed
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8616279102214159067, guid: 2da5764dfacadf54ba60076118fd3905, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1278,14 +1279,14 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4566466009991351761, guid: 2da5764dfacadf54ba60076118fd3905, type: 3}
+      insertIndex: 4
+      addedObject: {fileID: 1536310169}
+    - targetCorrespondingSourceObject: {fileID: 4566466009991351761, guid: 2da5764dfacadf54ba60076118fd3905, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1536310168}
     - targetCorrespondingSourceObject: {fileID: 4566466009991351761, guid: 2da5764dfacadf54ba60076118fd3905, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1536310167}
-    - targetCorrespondingSourceObject: {fileID: 4566466009991351761, guid: 2da5764dfacadf54ba60076118fd3905, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1536310169}
   m_SourcePrefab: {fileID: 100100000, guid: 2da5764dfacadf54ba60076118fd3905, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
