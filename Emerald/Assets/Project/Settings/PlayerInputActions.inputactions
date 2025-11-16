@@ -8,7 +8,7 @@
                 {
                     "name": "Move",
                     "type": "Value",
-                    "id": "1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
+                    "id": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
@@ -17,7 +17,7 @@
                 {
                     "name": "Look",
                     "type": "Value",
-                    "id": "2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q",
+                    "id": "2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
@@ -26,7 +26,7 @@
                 {
                     "name": "Jump",
                     "type": "Button",
-                    "id": "3c4d5e6f-7g8h-9i0j-1k2l-3m4n5o6p7q8r",
+                    "id": "3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -35,7 +35,7 @@
                 {
                     "name": "Sprint",
                     "type": "Button",
-                    "id": "4d5e6f7g-8h9i-0j1k-2l3m-4n5o6p7q8r9s",
+                    "id": "4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -44,7 +44,7 @@
                 {
                     "name": "ToggleCursor",
                     "type": "Button",
-                    "id": "5e6f7g8h-9i0j-1k2l-3m4n-5o6p7q8r9s0t",
+                    "id": "5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -54,7 +54,7 @@
             "bindings": [
                 {
                     "name": "WASD",
-                    "id": "6f7g8h9i-0j1k-2l3m-4n5o-6p7q8r9s0t1u",
+                    "id": "6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c",
                     "path": "2DVector",
                     "interactions": "",
                     "processors": "",
@@ -65,7 +65,7 @@
                 },
                 {
                     "name": "up",
-                    "id": "7g8h9i0j-1k2l-3m4n-5o6p-7q8r9s0t1u2v",
+                    "id": "7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d",
                     "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
@@ -76,7 +76,7 @@
                 },
                 {
                     "name": "down",
-                    "id": "8h9i0j1k-2l3m-4n5o-6p7q-8r9s0t1u2v3w",
+                    "id": "8b9c0d1e-2f3a-4b5c-6d7e-8f9a0b1c2d3e",
                     "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
@@ -87,7 +87,7 @@
                 },
                 {
                     "name": "left",
-                    "id": "9i0j1k2l-3m4n-5o6p-7q8r-9s0t1u2v3w4x",
+                    "id": "9c0d1e2f-3a4b-5c6d-7e8f-9a0b1c2d3e4f",
                     "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
@@ -98,7 +98,7 @@
                 },
                 {
                     "name": "right",
-                    "id": "0j1k2l3m-4n5o-6p7q-8r9s-0t1u2v3w4x5y",
+                    "id": "0d1e2f3a-4b5c-6d7e-8f9a-0b1c2d3e4f5a",
                     "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
@@ -109,7 +109,7 @@
                 },
                 {
                     "name": "",
-                    "id": "1k2l3m4n-5o6p-7q8r-9s0t-1u2v3w4x5y6z",
+                    "id": "1e2f3a4b-5c6d-7e8f-9a0b-1c2d3e4f5a6b",
                     "path": "<Mouse>/delta",
                     "interactions": "",
                     "processors": "",
@@ -120,7 +120,7 @@
                 },
                 {
                     "name": "",
-                    "id": "2l3m4n5o-6p7q-8r9s-0t1u-2v3w4x5y6z7a",
+                    "id": "2f3a4b5c-6d7e-8f9a-0b1c-2d3e4f5a6b7c",
                     "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
@@ -131,7 +131,7 @@
                 },
                 {
                     "name": "",
-                    "id": "3m4n5o6p-7q8r-9s0t-1u2v-3w4x5y6z7a8b",
+                    "id": "3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d",
                     "path": "<Keyboard>/leftShift",
                     "interactions": "",
                     "processors": "",
@@ -142,7 +142,7 @@
                 },
                 {
                     "name": "",
-                    "id": "4n5o6p7q-8r9s-0t1u-2v3w-4x5y6z7a8b9c",
+                    "id": "4b5c6d7e-8f9a-0b1c-2d3e-4f5a6b7c8d9e",
                     "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
