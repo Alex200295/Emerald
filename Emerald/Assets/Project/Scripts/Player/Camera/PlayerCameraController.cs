@@ -22,9 +22,10 @@ public class PlayerCameraController : MonoBehaviour
     [SerializeField] private float maxVerticalAngle = 80f;
 
     [Header("Configuration Cinemachine (si auto-créée)")]
-    [SerializeField] private float cameraDistance = 5f;
-    [SerializeField] private Vector3 shoulderOffset = new Vector3(0.5f, 0f, 0f);
-    [SerializeField] private float verticalArmLength = 0.4f;
+    [SerializeField] private float cameraFollowTargetHeight = 1.35f; // Hauteur au niveau des épaules pour un style RPG immersif
+    [SerializeField] private float cameraDistance = 4.5f;
+    [SerializeField] private Vector3 shoulderOffset = new Vector3(0.6f, -0.1f, 0f);
+    [SerializeField] private float verticalArmLength = 0.3f;
     [SerializeField] private float cameraSide = 1f;
 
     // Variables de rotation
@@ -41,11 +42,11 @@ public class PlayerCameraController : MonoBehaviour
         {
             GameObject followTarget = new GameObject("CameraFollowTarget");
             followTarget.transform.SetParent(transform);
-            followTarget.transform.localPosition = new Vector3(0f, 1.6f, 0f); // Hauteur des yeux
+            followTarget.transform.localPosition = new Vector3(0f, cameraFollowTargetHeight, 0f); // Hauteur configurable (épaules par défaut)
             followTarget.transform.localRotation = Quaternion.identity;
             cameraFollowTarget = followTarget.transform;
 
-            Debug.Log($"[PlayerCameraController] CameraFollowTarget créé automatiquement à {cameraFollowTarget.localPosition}");
+            Debug.Log($"[PlayerCameraController] CameraFollowTarget créé automatiquement à hauteur {cameraFollowTargetHeight}m (niveau épaules)");
         }
 
         // Auto-recherche de la Cinemachine Camera si non assignée

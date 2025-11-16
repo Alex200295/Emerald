@@ -35,7 +35,7 @@ Le `PlayerCameraController` s'auto-configure entièrement. Il suffit de l'ajoute
 2. **Sélectionner le GameObject racine "Player"**
 3. **Ajouter le composant** : `Add Component > Player Camera Controller`
 4. **C'est tout !** Le script va automatiquement :
-   - Créer un `CameraFollowTarget` à hauteur des yeux (Y = 1.6m)
+   - Créer un `CameraFollowTarget` au niveau des épaules (Y = 1.35m par défaut, style RPG immersif)
    - Rechercher ou créer une `Cinemachine Camera`
    - Configurer le `CinemachineThirdPersonFollow` (Body)
    - Configurer les références Follow et LookAt
@@ -48,8 +48,10 @@ Si vous préférez contrôler manuellement la configuration :
 
 1. Dans le prefab Player, **créer un enfant** du GameObject racine
 2. Le nommer **"CameraFollowTarget"**
-3. Le positionner à **Y = 1.6** (hauteur des yeux)
+3. Le positionner à **Y = 1.35** (hauteur des épaules pour un style RPG immersif)
 4. Assigner ce Transform au champ `Camera Follow Target` du script
+
+**Note :** Consultez le `CameraPresets_Guide.md` pour d'autres hauteurs selon le style de jeu souhaité.
 
 #### Étape 2 : Créer la Cinemachine Camera
 
@@ -135,10 +137,14 @@ L'ancien système utilisait un CameraHolder avec une caméra enfant. Avec Cinema
 
 | Paramètre | Type | Valeur par défaut | Description |
 |-----------|------|-------------------|-------------|
-| **Camera Distance** | float | 5.0 | Distance de la caméra derrière le joueur |
-| **Shoulder Offset** | Vector3 | (0.5, 0, 0) | Décalage par rapport à l'épaule |
-| **Vertical Arm Length** | float | 0.4 | Hauteur du bras vertical de la caméra |
+| **Camera Follow Target Height** | float | 1.35 | Hauteur du point de suivi (épaules pour style RPG immersif) |
+| **Camera Distance** | float | 4.5 | Distance de la caméra derrière le joueur |
+| **Shoulder Offset** | Vector3 | (0.6, -0.1, 0) | Décalage par rapport à l'épaule (X, Y, Z) |
+| **Vertical Arm Length** | float | 0.3 | Hauteur du bras vertical de la caméra |
 | **Camera Side** | float | 1.0 | Côté de la caméra (-1 = gauche, 1 = droite) |
+
+**⚠️ Note :** Ces valeurs par défaut sont optimisées pour un **style RPG immersif** (Skyrim, Assassin's Creed).
+Pour d'autres styles de jeux, consultez le **CameraPresets_Guide.md**.
 
 ---
 
@@ -332,6 +338,25 @@ Pour des besoins spécifiques (caméra sur l'épaule gauche, zoom dynamique, etc
 
 ---
 
+## 🎨 Presets de caméra
+
+Le système propose des **configurations optimisées** pour différents styles de jeux !
+
+📄 **Consultez le guide complet :** `CameraPresets_Guide.md`
+
+**Presets disponibles :**
+- 🎮 **RPG Immersif** (Skyrim, Assassin's Creed) - **Par défaut**
+- ⚔️ Action/Aventure (The Witcher 3, God of War)
+- 😱 Survival Horror (Resident Evil, The Last of Us)
+- 🔫 Shooter TPS (Uncharted, Tomb Raider)
+- 🎯 Platformer 3D (Ratchet & Clank)
+- 🌅 Exploration Zen (Journey, Abzû)
+- ⚡ Combat Arena (Dark Souls, Monster Hunter)
+
+Chaque preset inclut des valeurs recommandées pour tous les paramètres de la caméra.
+
+---
+
 ## Prochaines étapes
 
 ### Extensions recommandées
@@ -372,7 +397,8 @@ Pour toute question ou problème :
 
 ---
 
-**Version :** 1.0.0
+**Version :** 1.1.0
 **Dernière mise à jour :** 2025-11-16
+**Style par défaut :** RPG Immersif (optimisé pour Skyrim/Assassin's Creed)
 **Auteur :** Claude AI
 **Licence :** Apache License 2.0
