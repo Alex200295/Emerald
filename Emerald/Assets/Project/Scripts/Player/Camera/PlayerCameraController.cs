@@ -7,8 +7,7 @@ using Cinemachine;
 /// </summary>
 public class PlayerCameraController : MonoBehaviour
 {
-    [Header("Cinemachine Configuration")]
-    [SerializeField] private CinemachineVirtualCamera virtualCamera;
+    [Header("Références")]
     [SerializeField] private Transform cameraFollowTarget;
 
     [Header("Sensibilité de la souris")]
@@ -36,22 +35,9 @@ public class PlayerCameraController : MonoBehaviour
             followTarget.transform.localPosition = new Vector3(0f, 1.6f, 0f); // Hauteur des yeux
             followTarget.transform.localRotation = Quaternion.identity;
             cameraFollowTarget = followTarget.transform;
+
+            Debug.Log($"CameraFollowTarget créé automatiquement à {cameraFollowTarget.localPosition}");
         }
-
-        // Auto-création de la Virtual Camera si absente
-        if (virtualCamera == null)
-        {
-            virtualCamera = FindObjectOfType<CinemachineVirtualCamera>();
-
-            if (virtualCamera == null)
-            {
-                Debug.LogWarning("Cinemachine Virtual Camera manquante. Création automatique...");
-                CreateVirtualCamera();
-            }
-        }
-
-        // Configuration de la Virtual Camera
-        ConfigureVirtualCamera();
     }
 
     /// <summary>
@@ -82,64 +68,8 @@ public class PlayerCameraController : MonoBehaviour
         // Limiter la rotation verticale
         rotationY = Mathf.Clamp(rotationY, minVerticalAngle, maxVerticalAngle);
 
-        // Appliquer la rotation
+        // Appliquer la rotation au CameraFollowTarget
         cameraFollowTarget.rotation = Quaternion.Euler(rotationY, rotationX, 0f);
-    }
-
-    /// <summary>
-    /// Crée automatiquement une Cinemachine Virtual Camera.
-    /// </summary>
-    private void CreateVirtualCamera()
-    {
-        GameObject vcamObject = new GameObject("CM vcam_Player");
-        virtualCamera = vcamObject.AddComponent<CinemachineVirtualCamera>();
-
-        // Configuration par défaut
-        virtualCamera.Priority = 10;
-    }
-
-    /// <summary>
-    /// Configure la Cinemachine Virtual Camera.
-    /// </summary>
-    private void ConfigureVirtualCamera()
-    {
-        if (virtualCamera == null || cameraFollowTarget == null) return;
-
-        // Définir le Follow et LookAt
-        virtualCamera.Follow = cameraFollowTarget;
-        virtualCamera.LookAt = cameraFollowTarget;
-
-        // Configuration du Body (3rd Person)
-        var transposer = virtualCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
-        if (transposer == null)
-        {
-            // Ajouter le composant 3rd Person Follow
-            virtualCamera.AddCinemachineComponent<Cinemachine3rdPersonFollow>();
-            transposer = virtualCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
-        }
-
-        if (transposer != null)
-        {
-            transposer.CameraDistance = 5f;
-            transposer.ShoulderOffset = new Vector3(0.5f, 0f, 0f);
-            transposer.VerticalArmLength = 0.4f;
-            transposer.CameraSide = 1f;
-            transposer.Damping = new Vector3(0.1f, 0.25f, 0.3f);
-        }
-
-        // Configuration de l'Aim (Do Nothing pour contrôle manuel)
-        var composer = virtualCamera.GetCinemachineComponent<CinemachinePOV>();
-        if (composer == null)
-        {
-            virtualCamera.AddCinemachineComponent<CinemachinePOV>();
-            composer = virtualCamera.GetCinemachineComponent<CinemachinePOV>();
-        }
-
-        if (composer != null)
-        {
-            composer.m_HorizontalAxis.m_MaxSpeed = 0f;
-            composer.m_VerticalAxis.m_MaxSpeed = 0f;
-        }
     }
 
     /// <summary>
