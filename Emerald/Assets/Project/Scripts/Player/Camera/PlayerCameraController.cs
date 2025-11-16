@@ -1,15 +1,16 @@
 using UnityEngine;
+using Unity.Cinemachine;
 
 /// <summary>
-/// Contrôleur de caméra simple third-person.
-/// Gère la rotation de la caméra basée sur les entrées du joueur.
-/// Version simplifiée sans Cinemachine.
+/// Contrôleur de caméra utilisant Cinemachine 3.x.
+/// Gère la rotation de la caméra virtuelle basée sur les entrées du joueur.
+/// Compatible avec Cinemachine Camera (CM3).
 /// </summary>
 public class PlayerCameraController : MonoBehaviour
 {
     [Header("Références")]
     [SerializeField] private Transform cameraFollowTarget;
-    [SerializeField] private Camera mainCamera;
+    [SerializeField] private CinemachineCamera cinemachineCamera;
 
     [Header("Sensibilité de la souris")]
     [SerializeField] private float mouseSensitivityX = 2f;
@@ -18,12 +19,6 @@ public class PlayerCameraController : MonoBehaviour
     [Header("Limites de rotation verticale")]
     [SerializeField] private float minVerticalAngle = -40f;
     [SerializeField] private float maxVerticalAngle = 80f;
-
-    [Header("Configuration de la caméra")]
-    [SerializeField] private float cameraDistance = 5f;
-    [SerializeField] private float cameraHeight = 2f;
-    [SerializeField] private Vector3 cameraOffset = new Vector3(0.5f, 0f, 0f);
-    [SerializeField] private float cameraSmoothSpeed = 10f;
 
     // Variables de rotation
     private float rotationX = 0f;
@@ -34,12 +29,6 @@ public class PlayerCameraController : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        // Auto-récupération de la Main Camera si non assignée
-        if (mainCamera == null)
-        {
-            mainCamera = Camera.main;
-        }
-
         // Auto-création du CameraFollowTarget si absent
         if (cameraFollowTarget == null)
         {
@@ -51,6 +40,40 @@ public class PlayerCameraController : MonoBehaviour
 
             Debug.Log($"CameraFollowTarget créé automatiquement à {cameraFollowTarget.localPosition}");
         }
+
+        // Auto-recherche de la Cinemachine Camera si non assignée
+        if (cinemachineCamera == null)
+        {
+            cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+
+            if (cinemachineCamera == null)
+            {
+                Debug.LogWarning("Aucune Cinemachine Camera trouvée. Veuillez en créer une manuellement : GameObject > Cinemachine > Cinemachine Camera");
+            }
+            else
+            {
+                Debug.Log($"Cinemachine Camera trouvée automatiquement : {cinemachineCamera.name}");
+                ConfigureCinemachineCamera();
+            }
+        }
+        else
+        {
+            ConfigureCinemachineCamera();
+        }
+    }
+
+    /// <summary>
+    /// Configure la Cinemachine Camera pour suivre le joueur.
+    /// </summary>
+    private void ConfigureCinemachineCamera()
+    {
+        if (cinemachineCamera == null || cameraFollowTarget == null) return;
+
+        // Définir le Follow et LookAt
+        cinemachineCamera.Follow = cameraFollowTarget;
+        cinemachineCamera.LookAt = cameraFollowTarget;
+
+        Debug.Log($"Cinemachine Camera configurée pour suivre {cameraFollowTarget.name}");
     }
 
     /// <summary>
@@ -82,35 +105,8 @@ public class PlayerCameraController : MonoBehaviour
         rotationY = Mathf.Clamp(rotationY, minVerticalAngle, maxVerticalAngle);
 
         // Appliquer la rotation au CameraFollowTarget
+        // La Cinemachine Camera suivra automatiquement cette rotation
         cameraFollowTarget.rotation = Quaternion.Euler(rotationY, rotationX, 0f);
-
-        // Positionner la caméra
-        UpdateCameraPosition();
-    }
-
-    /// <summary>
-    /// Met à jour la position de la caméra pour suivre le joueur.
-    /// </summary>
-    private void UpdateCameraPosition()
-    {
-        if (mainCamera == null || cameraFollowTarget == null) return;
-
-        // Calculer la position cible de la caméra
-        Vector3 targetPosition = cameraFollowTarget.position
-            + cameraFollowTarget.up * cameraHeight
-            + cameraFollowTarget.right * cameraOffset.x
-            + cameraFollowTarget.up * cameraOffset.y
-            - cameraFollowTarget.forward * cameraDistance;
-
-        // Interpoler la position pour un mouvement fluide
-        mainCamera.transform.position = Vector3.Lerp(
-            mainCamera.transform.position,
-            targetPosition,
-            cameraSmoothSpeed * Time.deltaTime
-        );
-
-        // Faire regarder la caméra vers le follow target
-        mainCamera.transform.LookAt(cameraFollowTarget.position + cameraFollowTarget.up * cameraHeight);
     }
 
     /// <summary>
@@ -155,14 +151,6 @@ public class PlayerCameraController : MonoBehaviour
             // Dessiner la direction de vue
             Gizmos.color = Color.blue;
             Gizmos.DrawRay(cameraFollowTarget.position, cameraFollowTarget.forward * 2f);
-
-            // Dessiner la position de la caméra
-            if (mainCamera != null)
-            {
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawLine(cameraFollowTarget.position, mainCamera.transform.position);
-                Gizmos.DrawWireSphere(mainCamera.transform.position, 0.2f);
-            }
         }
     }
 }
