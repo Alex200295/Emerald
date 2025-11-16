@@ -24,7 +24,7 @@ public class PlayerMovement : MonoBehaviour
 
     // ==== COMPOSANTS ====
     private CharacterController controller;
-    private Transform cameraTransform;
+    private PlayerCameraController cameraController;
 
     // ==== VARIABLES D'ÉTAT ====
     private Vector3 velocity;
@@ -39,7 +39,13 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        cameraTransform = Camera.main.transform;
+        cameraController = GetComponent<PlayerCameraController>();
+
+        // Vérification de la présence de PlayerCameraController
+        if (cameraController == null)
+        {
+            Debug.LogWarning("[PlayerMovement] PlayerCameraController manquant. La direction de mouvement utilisera Camera.main comme fallback.");
+        }
 
         // Auto-création du groundCheck si absent
         if (groundCheck == null)
@@ -156,15 +162,28 @@ public class PlayerMovement : MonoBehaviour
     /// <returns>Direction mondiale du mouvement</returns>
     private Vector3 CalculateMoveDirection(Vector2 input)
     {
-        // Obtenir la direction avant de la caméra (ignorant l'axe Y)
-        Vector3 forward = cameraTransform.forward;
-        Vector3 right = cameraTransform.right;
+        Vector3 forward;
+        Vector3 right;
 
-        // Projeter sur le plan horizontal (Y = 0)
-        forward.y = 0f;
-        right.y = 0f;
-        forward.Normalize();
-        right.Normalize();
+        // Utiliser PlayerCameraController si disponible, sinon fallback sur Camera.main
+        if (cameraController != null)
+        {
+            forward = cameraController.GetCameraForward();
+            right = cameraController.GetCameraRight();
+        }
+        else
+        {
+            // Fallback : utiliser Camera.main si PlayerCameraController n'est pas disponible
+            Transform cameraTransform = Camera.main != null ? Camera.main.transform : transform;
+            forward = cameraTransform.forward;
+            right = cameraTransform.right;
+
+            // Projeter sur le plan horizontal (Y = 0)
+            forward.y = 0f;
+            right.y = 0f;
+            forward.Normalize();
+            right.Normalize();
+        }
 
         // Calculer la direction désirée
         Vector3 moveDirection = forward * input.y + right * input.x;
