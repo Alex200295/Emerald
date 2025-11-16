@@ -146,7 +146,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6532642777347231258}
-  - component: {fileID: 2015518835243826767}
   m_Layer: 0
   m_Name: CameraHolder
   m_TagString: Untagged
@@ -170,25 +169,6 @@ Transform:
   - {fileID: 409787679680609797}
   m_Father: {fileID: 8616279102214159067}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2015518835243826767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3654284619607940135}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9c5cb98ec9277449b301d9d6a615601, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerCamera
-  mouseSensitivityX: 200
-  mouseSensitivityY: 200
-  minVerticalAngle: -40
-  maxVerticalAngle: 80
-  cameraTarget: {fileID: 0}
-  cameraDistance: 0
-  cameraHeight: 0
 --- !u!1 &4566466009991351761
 GameObject:
   m_ObjectHideFlags: 0
