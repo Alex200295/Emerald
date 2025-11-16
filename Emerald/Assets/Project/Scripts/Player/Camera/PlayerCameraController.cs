@@ -2,14 +2,20 @@ using UnityEngine;
 using Unity.Cinemachine;
 
 /// <summary>
-/// Contrôleur de caméra utilisant Cinemachine.
+/// Contrôleur de caméra utilisant Cinemachine 3.x.
 /// Gère la rotation de la caméra virtuelle basée sur les entrées du joueur.
+/// Compatible avec Cinemachine Camera (CM3).
 /// </summary>
 public class PlayerCameraController : MonoBehaviour
 {
+<<<<<<< HEAD
     [Header("Cinemachine Configuration")]
     [SerializeField] private CinemachineCamera virtualCamera;
+=======
+    [Header("Références")]
+>>>>>>> origin/claude/setup-player-prefab-01HLL9MVeX5eCorJskUEnk8c
     [SerializeField] private Transform cameraFollowTarget;
+    [SerializeField] private CinemachineCamera cinemachineCamera;
 
     [Header("Sensibilité de la souris")]
     [SerializeField] private float mouseSensitivityX = 2f;
@@ -36,22 +42,47 @@ public class PlayerCameraController : MonoBehaviour
             followTarget.transform.localPosition = new Vector3(0f, 1.6f, 0f); // Hauteur des yeux
             followTarget.transform.localRotation = Quaternion.identity;
             cameraFollowTarget = followTarget.transform;
+
+            Debug.Log($"CameraFollowTarget créé automatiquement à {cameraFollowTarget.localPosition}");
         }
 
-        // Auto-création de la Virtual Camera si absente
-        if (virtualCamera == null)
+        // Auto-recherche de la Cinemachine Camera si non assignée
+        if (cinemachineCamera == null)
         {
+<<<<<<< HEAD
             virtualCamera = FindObjectOfType<CinemachineCamera>();
+=======
+            cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+>>>>>>> origin/claude/setup-player-prefab-01HLL9MVeX5eCorJskUEnk8c
 
-            if (virtualCamera == null)
+            if (cinemachineCamera == null)
             {
-                Debug.LogWarning("Cinemachine Virtual Camera manquante. Création automatique...");
-                CreateVirtualCamera();
+                Debug.LogWarning("Aucune Cinemachine Camera trouvée. Veuillez en créer une manuellement : GameObject > Cinemachine > Cinemachine Camera");
+            }
+            else
+            {
+                Debug.Log($"Cinemachine Camera trouvée automatiquement : {cinemachineCamera.name}");
+                ConfigureCinemachineCamera();
             }
         }
+        else
+        {
+            ConfigureCinemachineCamera();
+        }
+    }
 
-        // Configuration de la Virtual Camera
-        ConfigureVirtualCamera();
+    /// <summary>
+    /// Configure la Cinemachine Camera pour suivre le joueur.
+    /// </summary>
+    private void ConfigureCinemachineCamera()
+    {
+        if (cinemachineCamera == null || cameraFollowTarget == null) return;
+
+        // Définir le Follow et LookAt
+        cinemachineCamera.Follow = cameraFollowTarget;
+        cinemachineCamera.LookAt = cameraFollowTarget;
+
+        Debug.Log($"Cinemachine Camera configurée pour suivre {cameraFollowTarget.name}");
     }
 
     /// <summary>
@@ -82,11 +113,13 @@ public class PlayerCameraController : MonoBehaviour
         // Limiter la rotation verticale
         rotationY = Mathf.Clamp(rotationY, minVerticalAngle, maxVerticalAngle);
 
-        // Appliquer la rotation
+        // Appliquer la rotation au CameraFollowTarget
+        // La Cinemachine Camera suivra automatiquement cette rotation
         cameraFollowTarget.rotation = Quaternion.Euler(rotationY, rotationX, 0f);
     }
 
     /// <summary>
+<<<<<<< HEAD
     /// Crée automatiquement une Cinemachine Virtual Camera.
     /// </summary>
     private void CreateVirtualCamera()
@@ -143,6 +176,8 @@ public class PlayerCameraController : MonoBehaviour
     }
 
     /// <summary>
+=======
+>>>>>>> origin/claude/setup-player-prefab-01HLL9MVeX5eCorJskUEnk8c
     /// Obtient la direction avant de la caméra (utilisé pour le mouvement).
     /// </summary>
     public Vector3 GetCameraForward()
