@@ -974,10 +974,10 @@ Animator:
   m_GameObject: {fileID: 1536310161}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0f5b0b9512a859d47ad700da9be403b5, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
@@ -1182,7 +1182,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6573354288926037053, guid: 2da5764dfacadf54ba60076118fd3905, type: 3}
       propertyPath: m_NotificationBehavior
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6573354288926037053, guid: 2da5764dfacadf54ba60076118fd3905, type: 3}
       propertyPath: m_ActionEvents.Array.size
