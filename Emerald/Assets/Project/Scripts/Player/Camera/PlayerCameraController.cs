@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 
 /// <summary>
 /// Contrôleur de caméra utilisant Cinemachine 3.x.
@@ -8,12 +9,9 @@ using Unity.Cinemachine;
 /// </summary>
 public class PlayerCameraController : MonoBehaviour
 {
-<<<<<<< HEAD
     [Header("Cinemachine Configuration")]
     [SerializeField] private CinemachineCamera virtualCamera;
-=======
     [Header("Références")]
->>>>>>> origin/claude/setup-player-prefab-01HLL9MVeX5eCorJskUEnk8c
     [SerializeField] private Transform cameraFollowTarget;
     [SerializeField] private CinemachineCamera cinemachineCamera;
 
@@ -49,11 +47,9 @@ public class PlayerCameraController : MonoBehaviour
         // Auto-recherche de la Cinemachine Camera si non assignée
         if (cinemachineCamera == null)
         {
-<<<<<<< HEAD
-            virtualCamera = FindObjectOfType<CinemachineCamera>();
-=======
+            virtualCamera = FindFirstObjectByType<CinemachineCamera>();
+
             cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
->>>>>>> origin/claude/setup-player-prefab-01HLL9MVeX5eCorJskUEnk8c
 
             if (cinemachineCamera == null)
             {
@@ -119,7 +115,6 @@ public class PlayerCameraController : MonoBehaviour
     }
 
     /// <summary>
-<<<<<<< HEAD
     /// Crée automatiquement une Cinemachine Virtual Camera.
     /// </summary>
     private void CreateVirtualCamera()
@@ -143,12 +138,12 @@ public class PlayerCameraController : MonoBehaviour
         virtualCamera.LookAt = cameraFollowTarget;
 
         // Configuration du Body (3rd Person)
-        var transposer = virtualCamera.GetCinemachineComponent<CinemachineThirdPersonFollow>();
+        var transposer = virtualCamera.GetComponent<CinemachineThirdPersonFollow>();
         if (transposer == null)
         {
             // Ajouter le composant 3rd Person Follow
-            virtualCamera.AddCinemachineComponent<CinemachineThirdPersonFollow>();
-            transposer = virtualCamera.GetCinemachineComponent<CinemachineThirdPersonFollow>();
+            virtualCamera.AddComponent<CinemachineThirdPersonFollow>();
+            transposer = virtualCamera.GetComponent<CinemachineThirdPersonFollow>();
         }
 
         if (transposer != null)
@@ -161,11 +156,11 @@ public class PlayerCameraController : MonoBehaviour
         }
 
         // Configuration de l'Aim (Do Nothing pour contrôle manuel)
-        var composer = virtualCamera.GetCinemachineComponent<CinemachinePOV>();
+        var composer = virtualCamera.GetComponent<CinemachinePOV>();
         if (composer == null)
         {
-            virtualCamera.AddCinemachineComponent<CinemachinePOV>();
-            composer = virtualCamera.GetCinemachineComponent<CinemachinePOV>();
+            virtualCamera.AddComponent<CinemachinePOV>();
+            composer = virtualCamera.GetComponent<CinemachinePOV>();
         }
 
         if (composer != null)
@@ -176,8 +171,6 @@ public class PlayerCameraController : MonoBehaviour
     }
 
     /// <summary>
-=======
->>>>>>> origin/claude/setup-player-prefab-01HLL9MVeX5eCorJskUEnk8c
     /// Obtient la direction avant de la caméra (utilisé pour le mouvement).
     /// </summary>
     public Vector3 GetCameraForward()
