@@ -34,7 +34,7 @@ Emerald/
 ## 🎮 Développement
 
 ### Prérequis
-- Unity 2022.3.10f1 ou supérieur
+- Unity 6000.2.11f1 (Unity 6) ou supérieur
 - Git avec LFS
 - Éditeur de code (VS Code, Rider, Visual Studio)
 
