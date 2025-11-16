@@ -1,5 +1,5 @@
 using UnityEngine;
-using Cinemachine;
+using Unity.Cinemachine;
 
 /// <summary>
 /// Contrôleur de caméra utilisant Cinemachine.
@@ -8,7 +8,7 @@ using Cinemachine;
 public class PlayerCameraController : MonoBehaviour
 {
     [Header("Cinemachine Configuration")]
-    [SerializeField] private CinemachineVirtualCamera virtualCamera;
+    [SerializeField] private CinemachineCamera virtualCamera;
     [SerializeField] private Transform cameraFollowTarget;
 
     [Header("Sensibilité de la souris")]
@@ -41,7 +41,7 @@ public class PlayerCameraController : MonoBehaviour
         // Auto-création de la Virtual Camera si absente
         if (virtualCamera == null)
         {
-            virtualCamera = FindObjectOfType<CinemachineVirtualCamera>();
+            virtualCamera = FindObjectOfType<CinemachineCamera>();
 
             if (virtualCamera == null)
             {
@@ -92,7 +92,7 @@ public class PlayerCameraController : MonoBehaviour
     private void CreateVirtualCamera()
     {
         GameObject vcamObject = new GameObject("CM vcam_Player");
-        virtualCamera = vcamObject.AddComponent<CinemachineVirtualCamera>();
+        virtualCamera = vcamObject.AddComponent<CinemachineCamera>();
 
         // Configuration par défaut
         virtualCamera.Priority = 10;
@@ -110,12 +110,12 @@ public class PlayerCameraController : MonoBehaviour
         virtualCamera.LookAt = cameraFollowTarget;
 
         // Configuration du Body (3rd Person)
-        var transposer = virtualCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
+        var transposer = virtualCamera.GetCinemachineComponent<CinemachineThirdPersonFollow>();
         if (transposer == null)
         {
             // Ajouter le composant 3rd Person Follow
-            virtualCamera.AddCinemachineComponent<Cinemachine3rdPersonFollow>();
-            transposer = virtualCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
+            virtualCamera.AddCinemachineComponent<CinemachineThirdPersonFollow>();
+            transposer = virtualCamera.GetCinemachineComponent<CinemachineThirdPersonFollow>();
         }
 
         if (transposer != null)
