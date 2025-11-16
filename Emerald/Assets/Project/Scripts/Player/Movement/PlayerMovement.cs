@@ -1,23 +1,23 @@
 using UnityEngine;
 
 /// <summary>
-/// GËre le mouvement physique du personnage.
-/// ContrÙle la marche, le sprint, le saut et la gravitÈ.
+/// G√®re le mouvement physique du personnage.
+/// Contr√¥le la marche, le sprint, le saut et la gravit√©.
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
-    // ==== PARAM»TRES DE MOUVEMENT ====
-    [Header("ParamËtres de dÈplacement")]
+    // ==== PARAM√àTRES DE MOUVEMENT ====
+    [Header("Param√®tres de d√©placement")]
     [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float sprintSpeed = 8f;
     [SerializeField] private float rotationSpeed = 10f;
 
-    [Header("ParamËtres de saut")]
+    [Header("Param√®tres de saut")]
     [SerializeField] private float jumpHeight = 2f;
     [SerializeField] private float gravity = -9.81f;
 
-    [Header("DÈtection du sol")]
+    [Header("D√©tection du sol")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundDistance = 0.4f;
     [SerializeField] private LayerMask groundMask;
@@ -26,31 +26,75 @@ public class PlayerMovement : MonoBehaviour
     private CharacterController controller;
     private Transform cameraTransform;
 
-    // ==== VARIABLES D'…TAT ====
+    // ==== VARIABLES D'√âTAT ====
     private Vector3 velocity;
     private bool isGrounded;
+    private bool wasGrounded;
+    private bool wasSprinting;
+    private float airTime;
 
     /// <summary>
-    /// Initialisation des rÈfÈrences.
+    /// Initialisation des r√©f√©rences.
     /// </summary>
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
         cameraTransform = Camera.main.transform;
+
+        // Auto-cr√©ation du groundCheck si absent
+        if (groundCheck == null)
+        {
+            CreateGroundCheck();
+        }
     }
 
     /// <summary>
-    /// Traite le mouvement du joueur basÈ sur les entrÈes.
+    /// Cr√©e automatiquement le groundCheck si absent.
     /// </summary>
-    /// <param name="input">Vecteur de direction normalisÈ</param>
+    private void CreateGroundCheck()
+    {
+        GameObject groundCheckObject = new GameObject("GroundCheck");
+        groundCheckObject.transform.SetParent(transform);
+
+        // Positionner le groundCheck sous le CharacterController
+        if (controller != null)
+        {
+            float controllerHeight = controller.height;
+            float controllerRadius = controller.radius;
+            Vector3 controllerCenter = controller.center;
+
+            // Position au niveau du sol, sous les pieds
+            groundCheckObject.transform.localPosition = new Vector3(
+                controllerCenter.x,
+                controllerCenter.y - (controllerHeight / 2f) + 0.1f,
+                controllerCenter.z
+            );
+        }
+        else
+        {
+            groundCheckObject.transform.localPosition = new Vector3(0f, 0.1f, 0f);
+        }
+
+        groundCheck = groundCheckObject.transform;
+
+        Debug.Log("GroundCheck cr√©√© automatiquement √† " + groundCheck.localPosition);
+    }
+
+    /// <summary>
+    /// Traite le mouvement du joueur bas√© sur les entr√©es.
+    /// </summary>
+    /// <param name="input">Vecteur de direction normalis√©</param>
     /// <param name="isSprinting">Le joueur sprinte-t-il?</param>
     /// <param name="jump">Le joueur demande-t-il un saut?</param>
     public void HandleMovement(Vector2 input, bool isSprinting, bool jump)
     {
-        // VÈrification si le personnage est au sol
+        // V√©rification si le personnage est au sol
         CheckGrounded();
 
-        // Calcul de la direction de mouvement relative ‡ la camÈra
+        // D√©tection du changement d'√©tat de sprint
+        HandleSprintEvents(isSprinting);
+
+        // Calcul de la direction de mouvement relative √† la cam√©ra
         Vector3 moveDirection = CalculateMoveDirection(input);
 
         // Appliquer le mouvement horizontal
@@ -62,18 +106,34 @@ public class PlayerMovement : MonoBehaviour
             RotateCharacter(moveDirection);
         }
 
-        // GÈrer le saut
+        // G√©rer le saut
         if (jump && isGrounded)
         {
             Jump();
         }
 
-        // Appliquer la gravitÈ
+        // Appliquer la gravit√©
         ApplyGravity();
+
+        // Gestion du temps en l'air
+        if (!isGrounded)
+        {
+            airTime += Time.fixedDeltaTime;
+        }
+
+        // D√©clencher √©v√©nement d'atterrissage
+        if (isGrounded && !wasGrounded && airTime > 0.1f)
+        {
+            EventManager.Instance.TriggerEvent(new PlayerLandEvent(transform.position, airTime));
+            airTime = 0f;
+        }
+
+        // Sauvegarder l'√©tat pour la prochaine frame
+        wasGrounded = isGrounded;
     }
 
     /// <summary>
-    /// VÈrifie si le personnage est au sol via une sphËre de dÈtection.
+    /// V√©rifie si le personnage est au sol via une sph√®re de d√©tection.
     /// </summary>
     private void CheckGrounded()
     {
@@ -82,21 +142,21 @@ public class PlayerMovement : MonoBehaviour
             isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
         }
 
-        // RÈinitialiser la vÈlocitÈ verticale si au sol
+        // R√©initialiser la v√©locit√© verticale si au sol
         if (isGrounded && velocity.y < 0)
         {
-            velocity.y = -2f; // Petite valeur nÈgative pour maintenir le contact
+            velocity.y = -2f; // Petite valeur n√©gative pour maintenir le contact
         }
     }
 
     /// <summary>
-    /// Calcule la direction de mouvement relative ‡ la camÈra.
+    /// Calcule la direction de mouvement relative √† la cam√©ra.
     /// </summary>
-    /// <param name="input">EntrÈe directionnelle (normalisÈe)</param>
+    /// <param name="input">Entr√©e directionnelle (normalis√©e)</param>
     /// <returns>Direction mondiale du mouvement</returns>
     private Vector3 CalculateMoveDirection(Vector2 input)
     {
-        // Obtenir la direction avant de la camÈra (ignorant l'axe Y)
+        // Obtenir la direction avant de la cam√©ra (ignorant l'axe Y)
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
 
@@ -106,7 +166,7 @@ public class PlayerMovement : MonoBehaviour
         forward.Normalize();
         right.Normalize();
 
-        // Calculer la direction dÈsirÈe
+        // Calculer la direction d√©sir√©e
         Vector3 moveDirection = forward * input.y + right * input.x;
         return moveDirection;
     }
@@ -118,16 +178,16 @@ public class PlayerMovement : MonoBehaviour
     /// <param name="isSprinting">Utiliser la vitesse de sprint?</param>
     private void ApplyMovement(Vector3 direction, bool isSprinting)
     {
-        // Choisir la vitesse appropriÈe
+        // Choisir la vitesse appropri√©e
         float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
 
         // Appliquer le mouvement horizontal
         Vector3 movement = direction * currentSpeed * Time.fixedDeltaTime;
 
-        // Appliquer le mouvement vertical (gravitÈ/saut)
+        // Appliquer le mouvement vertical (gravit√©/saut)
         movement.y = velocity.y * Time.fixedDeltaTime;
 
-        // DÈplacer le personnage
+        // D√©placer le personnage
         controller.Move(movement);
     }
 
@@ -149,17 +209,39 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// ExÈcute un saut en appliquant une vÈlocitÈ verticale.
+    /// Ex√©cute un saut en appliquant une v√©locit√© verticale.
     /// </summary>
     private void Jump()
     {
         // Formule : v = sqrt(h * -2 * g)
-        // o˘ h = hauteur de saut dÈsirÈe, g = gravitÈ
+        // o√π h = hauteur de saut d√©sir√©e, g = gravit√©
         velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+        // D√©clencher l'√©v√©nement de saut
+        EventManager.Instance.TriggerEvent(new PlayerJumpEvent(transform.position, jumpHeight));
     }
 
     /// <summary>
-    /// Applique la gravitÈ au personnage.
+    /// G√®re les √©v√©nements de sprint.
+    /// </summary>
+    private void HandleSprintEvents(bool isSprinting)
+    {
+        // D√©but du sprint
+        if (isSprinting && !wasSprinting)
+        {
+            EventManager.Instance.TriggerEvent(new PlayerSprintStartEvent());
+        }
+        // Fin du sprint
+        else if (!isSprinting && wasSprinting)
+        {
+            EventManager.Instance.TriggerEvent(new PlayerSprintStopEvent());
+        }
+
+        wasSprinting = isSprinting;
+    }
+
+    /// <summary>
+    /// Applique la gravit√© au personnage.
     /// </summary>
     private void ApplyGravity()
     {
@@ -167,7 +249,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Visualisation de la sphËre de dÈtection du sol dans l'Èditeur.
+    /// Visualisation de la sph√®re de d√©tection du sol dans l'√©diteur.
     /// </summary>
     private void OnDrawGizmosSelected()
     {
@@ -177,4 +259,14 @@ public class PlayerMovement : MonoBehaviour
             Gizmos.DrawWireSphere(groundCheck.position, groundDistance);
         }
     }
+
+    /// <summary>
+    /// Propri√©t√© publique pour savoir si le joueur est au sol.
+    /// </summary>
+    public bool IsGrounded => isGrounded;
+
+    /// <summary>
+    /// Propri√©t√© publique pour obtenir la vitesse de mouvement actuelle.
+    /// </summary>
+    public float CurrentSpeed => controller.velocity.magnitude;
 }

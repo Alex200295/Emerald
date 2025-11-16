@@ -1,46 +1,146 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
-/// ContrÙleur principal du joueur.
-/// GËre la capture des entrÈes utilisateur et orchestre les composants
-/// de mouvement et de camÈra.
+/// Contr√¥leur principal du joueur.
+/// G√®re la capture des entr√©es utilisateur et orchestre les composants
+/// de mouvement et de cam√©ra.
+/// Utilise le nouveau Unity Input System.
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(PlayerInput))]
 public class PlayerController : MonoBehaviour
 {
     // ==== COMPOSANTS ====
     private CharacterController characterController;
     private PlayerMovement playerMovement;
-    private PlayerCamera playerCamera;
+    private PlayerCameraController cameraController;
+    private PlayerInput playerInput;
+    private PlayerAnimationController animationController;
 
-    // ==== VARIABLES D'ENTR…E ====
+    // ==== VARIABLES D'ENTR√âE ====
     private Vector2 movementInput;
-    private Vector2 cameraInput;
+    private Vector2 lookInput;
     private bool jumpPressed;
-    private bool sprintPressed;
+    private bool isSprinting;
+
+    // ==== INPUT ACTIONS ====
+    private InputAction moveAction;
+    private InputAction lookAction;
+    private InputAction jumpAction;
+    private InputAction sprintAction;
+    private InputAction toggleCursorAction;
 
     /// <summary>
-    /// Initialisation des rÈfÈrences aux composants.
-    /// AppelÈ automatiquement par Unity au dÈmarrage.
+    /// Initialisation des r√©f√©rences aux composants.
+    /// Appel√© automatiquement par Unity au d√©marrage.
     /// </summary>
     private void Awake()
     {
-        // RÈcupÈration du CharacterController (ajoutÈ automatiquement)
+        // R√©cup√©ration du CharacterController (ajout√© automatiquement)
         characterController = GetComponent<CharacterController>();
 
-        // RÈcupÈration des composants de mouvement et camÈra
+        // R√©cup√©ration des composants de mouvement et cam√©ra
         playerMovement = GetComponent<PlayerMovement>();
-        playerCamera = GetComponentInChildren<PlayerCamera>();
+        cameraController = GetComponent<PlayerCameraController>();
+        playerInput = GetComponent<PlayerInput>();
+        animationController = GetComponentInChildren<PlayerAnimationController>();
 
-        // VÈrification de la prÈsence des composants requis
+        // V√©rification de la pr√©sence des composants requis
         if (playerMovement == null)
         {
             Debug.LogError("PlayerMovement manquant sur " + gameObject.name);
         }
 
-        if (playerCamera == null)
+        if (cameraController == null)
         {
-            Debug.LogError("PlayerCamera manquant sur " + gameObject.name);
+            Debug.LogError("PlayerCameraController manquant sur " + gameObject.name);
+        }
+
+        if (playerInput == null)
+        {
+            Debug.LogError("PlayerInput manquant sur " + gameObject.name);
+        }
+
+        // Configuration des Input Actions
+        SetupInputActions();
+
+        // Abonnement aux √©v√©nements
+        SubscribeToEvents();
+    }
+
+    /// <summary>
+    /// S'abonne aux √©v√©nements du jeu.
+    /// </summary>
+    private void SubscribeToEvents()
+    {
+        EventManager.Instance.Subscribe<PlayerJumpEvent>(OnPlayerJump);
+        EventManager.Instance.Subscribe<PlayerSprintStartEvent>(OnPlayerSprintStart);
+        EventManager.Instance.Subscribe<PlayerSprintStopEvent>(OnPlayerSprintStop);
+    }
+
+    /// <summary>
+    /// Callback pour l'√©v√©nement de saut.
+    /// </summary>
+    private void OnPlayerJump(PlayerJumpEvent evt)
+    {
+        if (animationController != null)
+        {
+            animationController.TriggerJump();
+        }
+    }
+
+    /// <summary>
+    /// Callback pour le d√©but du sprint.
+    /// </summary>
+    private void OnPlayerSprintStart(PlayerSprintStartEvent evt)
+    {
+        if (animationController != null)
+        {
+            animationController.SetSprinting(true);
+        }
+    }
+
+    /// <summary>
+    /// Callback pour la fin du sprint.
+    /// </summary>
+    private void OnPlayerSprintStop(PlayerSprintStopEvent evt)
+    {
+        if (animationController != null)
+        {
+            animationController.SetSprinting(false);
+        }
+    }
+
+    /// <summary>
+    /// Configure les Input Actions et leurs callbacks.
+    /// </summary>
+    private void SetupInputActions()
+    {
+        if (playerInput == null) return;
+
+        // R√©cup√©ration des actions depuis le PlayerInput
+        moveAction = playerInput.actions["Move"];
+        lookAction = playerInput.actions["Look"];
+        jumpAction = playerInput.actions["Jump"];
+        sprintAction = playerInput.actions["Sprint"];
+        toggleCursorAction = playerInput.actions["ToggleCursor"];
+
+        // Abonnement aux √©v√©nements
+        if (jumpAction != null)
+        {
+            jumpAction.performed += OnJumpPerformed;
+        }
+
+        if (sprintAction != null)
+        {
+            sprintAction.performed += OnSprintPerformed;
+            sprintAction.canceled += OnSprintCanceled;
+        }
+
+        if (toggleCursorAction != null)
+        {
+            toggleCursorAction.performed += OnToggleCursorPerformed;
         }
     }
 
@@ -49,80 +149,99 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Start()
     {
-        // Verrouiller et masquer le curseur pour une expÈrience immersive
+        // Verrouiller et masquer le curseur pour une exp√©rience immersive
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
     /// <summary>
-    /// Capture les entrÈes utilisateur ‡ chaque frame.
-    /// Update() est appelÈ une fois par frame par Unity.
+    /// Capture les entr√©es utilisateur √† chaque frame.
+    /// Update() est appel√© une fois par frame par Unity.
     /// </summary>
     private void Update()
     {
         CaptureInputs();
-
-        // Gestion de la touche …chap pour dÈverrouiller le curseur
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            ToggleCursorLock();
-        }
     }
 
     /// <summary>
-    /// Mise ‡ jour physique ‡ intervalle fixe.
-    /// FixedUpdate() garantit une frÈquence constante pour la physique.
+    /// Mise √† jour physique √† intervalle fixe.
+    /// FixedUpdate() garantit une fr√©quence constante pour la physique.
     /// </summary>
     private void FixedUpdate()
     {
-        // DÈlÈgation du mouvement au composant PlayerMovement
+        // D√©l√©gation du mouvement au composant PlayerMovement
         if (playerMovement != null)
         {
-            playerMovement.HandleMovement(movementInput, sprintPressed, jumpPressed);
-            jumpPressed = false; // RÈinitialiser aprËs traitement
+            playerMovement.HandleMovement(movementInput, isSprinting, jumpPressed);
+            jumpPressed = false; // R√©initialiser apr√®s traitement
         }
     }
 
     /// <summary>
-    /// Mise ‡ jour de la camÈra aprËs tous les autres calculs.
-    /// LateUpdate() est appelÈ aprËs Update() et FixedUpdate().
+    /// Mise √† jour de la cam√©ra apr√®s tous les autres calculs.
+    /// LateUpdate() est appel√© apr√®s Update() et FixedUpdate().
     /// </summary>
     private void LateUpdate()
     {
-        // DÈlÈgation de la rotation de camÈra au composant PlayerCamera
-        if (playerCamera != null)
+        // D√©l√©gation de la rotation de cam√©ra au composant PlayerCameraController
+        if (cameraController != null)
         {
-            playerCamera.HandleCameraRotation(cameraInput);
+            cameraController.HandleCameraRotation(lookInput);
         }
     }
 
     /// <summary>
-    /// Capture toutes les entrÈes clavier et souris.
+    /// Capture toutes les entr√©es depuis le nouveau Input System.
     /// </summary>
     private void CaptureInputs()
     {
-        // EntrÈes de dÈplacement (ZQSD / WASD)
-        float horizontal = Input.GetAxisRaw("Horizontal"); // A/D ou Q/D
-        float vertical = Input.GetAxisRaw("Vertical");     // W/S ou Z/S
-        movementInput = new Vector2(horizontal, vertical).normalized;
-
-        // EntrÈes de camÈra (mouvement de la souris)
-        float mouseX = Input.GetAxis("Mouse X");
-        float mouseY = Input.GetAxis("Mouse Y");
-        cameraInput = new Vector2(mouseX, mouseY);
-
-        // DÈtection du saut (Espace)
-        if (Input.GetButtonDown("Jump"))
+        if (moveAction != null)
         {
-            jumpPressed = true;
+            movementInput = moveAction.ReadValue<Vector2>();
         }
 
-        // DÈtection du sprint (Shift gauche maintenu)
-        sprintPressed = Input.GetKey(KeyCode.LeftShift);
+        if (lookAction != null)
+        {
+            lookInput = lookAction.ReadValue<Vector2>();
+        }
+    }
+
+    // ==== CALLBACKS DES INPUT ACTIONS ====
+
+    /// <summary>
+    /// Callback appel√© lorsque le joueur appuie sur la touche de saut.
+    /// </summary>
+    private void OnJumpPerformed(InputAction.CallbackContext context)
+    {
+        jumpPressed = true;
     }
 
     /// <summary>
-    /// Bascule entre curseur verrouillÈ et curseur libre.
+    /// Callback appel√© lorsque le joueur commence √† sprinter.
+    /// </summary>
+    private void OnSprintPerformed(InputAction.CallbackContext context)
+    {
+        isSprinting = true;
+    }
+
+    /// <summary>
+    /// Callback appel√© lorsque le joueur arr√™te de sprinter.
+    /// </summary>
+    private void OnSprintCanceled(InputAction.CallbackContext context)
+    {
+        isSprinting = false;
+    }
+
+    /// <summary>
+    /// Callback appel√© lorsque le joueur bascule le curseur.
+    /// </summary>
+    private void OnToggleCursorPerformed(InputAction.CallbackContext context)
+    {
+        ToggleCursorLock();
+    }
+
+    /// <summary>
+    /// Bascule entre curseur verrouill√© et curseur libre.
     /// </summary>
     private void ToggleCursorLock()
     {
@@ -135,6 +254,37 @@ public class PlayerController : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+        }
+    }
+
+    /// <summary>
+    /// D√©sabonnement des √©v√©nements lors de la destruction.
+    /// </summary>
+    private void OnDestroy()
+    {
+        // D√©sabonnement des Input Actions
+        if (jumpAction != null)
+        {
+            jumpAction.performed -= OnJumpPerformed;
+        }
+
+        if (sprintAction != null)
+        {
+            sprintAction.performed -= OnSprintPerformed;
+            sprintAction.canceled -= OnSprintCanceled;
+        }
+
+        if (toggleCursorAction != null)
+        {
+            toggleCursorAction.performed -= OnToggleCursorPerformed;
+        }
+
+        // D√©sabonnement des √©v√©nements du jeu
+        if (EventManager.Instance != null)
+        {
+            EventManager.Instance.Unsubscribe<PlayerJumpEvent>(OnPlayerJump);
+            EventManager.Instance.Unsubscribe<PlayerSprintStartEvent>(OnPlayerSprintStart);
+            EventManager.Instance.Unsubscribe<PlayerSprintStopEvent>(OnPlayerSprintStop);
         }
     }
 }
