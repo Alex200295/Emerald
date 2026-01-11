@@ -32,10 +32,12 @@ public class PlayerMovement : MonoBehaviour
     private bool wasGrounded;
     private bool wasSprinting;
     private float airTime;
+    private float speedMultiplier = 1f;
+    private bool isStrafeMode = false;
 
     // ==== NOUVEAU : VARIABLES POUR ANIMATIONS ====
     private Vector3 localVelocity;  // Vélocité dans l'espace local du personnage
-    private Vector2 movementInput;  // Dernière entrée de mouvement
+    internal Vector2 movementInput;  // Dernière entrée de mouvement
 
     /// <summary>
     /// Initialisation des références.
@@ -92,7 +94,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 moveDirection = CalculateMoveDirection(input);
         ApplyMovement(moveDirection, isSprinting);
 
-        if (moveDirection.magnitude >= 0.1f)
+        if (moveDirection.magnitude >= 0.1f && !isStrafeMode)
         {
             RotateCharacter(moveDirection);
         }
@@ -180,7 +182,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void ApplyMovement(Vector3 direction, bool isSprinting)
     {
-        float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
+        float currentSpeed = (isSprinting ? sprintSpeed : walkSpeed) * speedMultiplier;
         Vector3 movement = direction * currentSpeed * Time.fixedDeltaTime;
         movement.y = velocity.y * Time.fixedDeltaTime;
         controller.Move(movement);
@@ -200,6 +202,15 @@ public class PlayerMovement : MonoBehaviour
     {
         velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         EventManager.Instance.TriggerEvent(new PlayerJumpEvent(transform.position, jumpHeight));
+    }
+
+    /// <summary>
+    /// Active ou désactive le mode strafe (mouvement latéral).
+    /// En mode strafe, le joueur ne tourne pas automatiquement dans la direction du mouvement.
+    /// </summary>
+    public void SetStrafeMode(bool enabled)
+    {
+        isStrafeMode = enabled;
     }
 
     private void HandleSprintEvents(bool isSprinting)
@@ -231,6 +242,11 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // ==== NOUVELLES PROPRIÉTÉS PUBLIQUES POUR LES ANIMATIONS ====
+    public float SpeedMultiplier
+    {
+        get => speedMultiplier;
+        set => speedMultiplier = Mathf.Max(0f, value);
+    }
 
     /// <summary>
     /// Vitesse de déplacement horizontal (X) dans l'espace local du personnage.

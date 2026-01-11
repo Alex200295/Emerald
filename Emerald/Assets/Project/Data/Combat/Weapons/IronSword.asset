@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 014cf0152fe71e8438ebba0787abd414, type: 3}
+  m_Name: IronSword
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  weaponName: Iron Sword
+  description: "Une \xE9p\xE9e basique pour d\xE9buter."
+  weaponPrefab: {fileID: 919132149155446097, guid: 9932a67a94948964686ed956aa292272, type: 3}
+  gripPositionOffset: {x: 0, y: 0, z: 0}
+  gripRotationOffset: {x: 0, y: 0, z: 0}
+  attackPowerMultiplier: 1
+  attackSpeedMultiplier: 1
+  criticalChance: 0.05
+  criticalDamageMultiplier: 2
+  weaponRange: 2
+  lightAttackCombo:
+  - {fileID: 11400000, guid: f2da82e6e89d54647b5a895858c1b136, type: 2}
+  - {fileID: 11400000, guid: f03cf723adfbbc149ae432f79bb7a3d6, type: 2}
+  - {fileID: 11400000, guid: 2415596b129d41348a84e21cb8010f2d, type: 2}
+  heavyAttackCombo:
+  - {fileID: 11400000, guid: 76a82c1b796d9a1439907d9227c0d959, type: 2}
+  chargedAttack: {fileID: 0}
+  runningAttack: {fileID: 0}
+  dodgeAttack: {fileID: 0}
+  weaponEffectPrefab: {fileID: 0}
+  effectAttachPoint: {fileID: 0}

@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2311c748006609f4e885d9aaac82fa60, type: 3}
+  m_Name: LightAttack2_Sword
+  m_EditorClassIdentifier: Assembly-CSharp::AttackData
+  attackName: Light Attack 2
+  attackType: 0
+  animationName: Sword_Light_Attack_2
+  animationDuration: 2.767
+  startupFrames: 8
+  activeFrames: 4
+  recoveryFrames: 20
+  baseDamage: 20
+  damageType: 0
+  poiseDamage: 15
+  knockbackForce: 5
+  knockbackUpwardForce: 0.2
+  staminaCost: 10
+  canBeCanceled: 0
+  cancelWindowFrame: 15
+  possibleFollowUps:
+  - {fileID: 11400000, guid: 2415596b129d41348a84e21cb8010f2d, type: 2}
+  comboWindowDuration: 0.7
+  hitVFXPrefab: {fileID: 5238538877814813142, guid: 47096eff328e11a418ace7db2d72aa97, type: 3}
+  weaponTrailPrefab: {fileID: 8597731318025692521, guid: ae6bdf3417a5d6047a559654858dac31, type: 3}
+  swingSound: {fileID: 8300000, guid: 90a9fcc98e060804794183b51e59e4cc, type: 3}
+  hitSound: {fileID: 0}
